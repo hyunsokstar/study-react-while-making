@@ -1,18 +1,26 @@
-import { on, qs } from "../helpers.js";
+import { on , qs } from "../helpers.js";
 import View from "./View.js";
 const tag = "[SearchFormView]";
+
 
 
 export default class SearchFormView extends View {
     constructor() {
         super(qs("#search-form-view")); // dom 을 찾아서 this.element 로 초기화
-        console.log("this.element : ", this.element);
+        this.resetElement = qs("[type=reset", this.element); // 그밑의 하위 컴퍼넌트인 x버튼 돔을 찾아서 this.resetElement 에 저장
+        this.inputElement = qs("[type=text]", this.element); // search-form-view 밑의 input box에 대해 this.inputElement 로 관리
+        
+        this.showResetButton(false); // this.showResetButton(false) 를 호출해서 x 버튼 돔에 보이지 않도록 css 설정 하기
 
-        this.inputElement = qs("[type=text]", this.element);
-        this.resetElement = qs("[type=reset]", this.element);
+        this.bindEvents(); // 이벤트 등록 하기 
+    }
 
-        this.showResetButton(false); // this.showResetButton(false) 를 호출해서 x 버튼 돔에 보이지 않도록 css 설정 하기 
-        this.bindEvents();
+    bindEvents() {
+        on(this.inputElement, "keyup", () => this.handleKeyup());
+        on(this.element, "submit", (event) => this.handleSubmit(event)); // 검색 submit 이벤트
+
+        this.on("reset", () => this.handleReset());
+        
     }
 
     showResetButton(visible = true) {
@@ -20,27 +28,14 @@ export default class SearchFormView extends View {
         this.resetElement.style.display = visible ? "block" : "none";
     }
 
-    bindEvents() {
-        on(this.inputElement, "keyup", () => this.handleKeyup());
-        on(this.element, "submit", (event) => this.handleSubmit(event));
-
-        // reset 이벤트 추가 11
-        this.on("reset", () => this.handleReset());
-    }
-
     handleKeyup() {
-        console.log("keyup event 발생");
+        // console.log(tag, "handleKeyup", this.inputElement.value);
         const { value } = this.inputElement
         this.showResetButton(value.length > 0);
-
-        if(value.length <=0) {
-            this.handleReset();
-        }
     }
 
     handleSubmit(event) {
         event.preventDefault();
-        console.log(tag, "handleSubmit");
         const { value } = this.inputElement
         this.emit("@submit", { value });
     }
@@ -49,5 +44,12 @@ export default class SearchFormView extends View {
         console.log("reset 이벤트 발생");
         this.emit("@reset");
     }
-    
+
+    show(value = "") {
+        console.log("show from SearchFormView");
+        this.inputElement.value = value;
+        this.showResetButton(this.inputElement.value.length > 0);
+        super.show();
+    }
+
 }

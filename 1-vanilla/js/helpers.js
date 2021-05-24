@@ -14,10 +14,12 @@ export function on(target, eventName, handler) {
   target.addEventListener(eventName, handler);
 }
 
-export function delegate(target, eventName, selector, handler) {
+// 이런식으로 호출 delegate(this.element, 'click', "li", event => this.handleClick(event));
+// target 에서 발생한 eventName 이벤트에 emitEvent 함수를 실행
+export function delegate( target, eventName, selector, handler ) {
+  // 이벤트 정보를 받아와서 이벤트가 발생한 타겟에 대해 핸들러 함수를 실행
   const emitEvent = (event) => {
     const potentialElements = qsAll(selector, target);
-
     for (const potentialElement of potentialElements) {
       if (potentialElement === event.target) {
         return handler.call(event.target, event);
@@ -25,6 +27,7 @@ export function delegate(target, eventName, selector, handler) {
     }
   };
 
+  // target 에서 발생한 eventName 이벤트에 emitEvent 함수를 실행
   on(target, eventName, emitEvent);
 }
 

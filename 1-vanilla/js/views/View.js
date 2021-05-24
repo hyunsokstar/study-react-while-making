@@ -1,9 +1,10 @@
 import { emit, on } from "../helpers.js";
-
 const tag = "[View]";
+
 
 export default class View {
   constructor(element) {
+    console.log(tag, constructor);
     if (!element) throw "no element";
 
     this.element = element;
@@ -18,6 +19,7 @@ export default class View {
   }
 
   show() {
+    console.log("view : show 함수 호출 확인");
     this.element.style.display = this.originalDisplay;
     return this;
   }
